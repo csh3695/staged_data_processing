@@ -46,9 +46,11 @@ def task_5(x: pd.DataFrame):
 
 r0 = task_0()
 r1 = task_1()
-r1_ = [task_1() for _ in range(100)]    # 0 execution because execution is not propagated from the final result r5(Dangling Promise).
+r1_ = [
+    task_1() for _ in range(100)
+]  # 0 execution because execution is not propagated from the final result r5(Dangling Promise).
 r2 = task_2(r0, r1)
 r3 = task_3(r2)
-r4 = task_4(r3, r2, r3) # r3 is referenced twice but only executed once
+r4 = task_4(r3, r2, r3)  # r3 is referenced twice but only executed once
 r5 = task_5(r4)
 r5.execute()

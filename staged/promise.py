@@ -17,7 +17,9 @@ class Promise:
         self._args: Tuple[Any] = None
         self._kwargs: Dict[str, Any] = None
 
-    def bind_function(self, fn: Callable[..., Any], args: Tuple[Any], kwargs: Dict[str, Any]):
+    def bind_function(
+        self, fn: Callable[..., Any], args: Tuple[Any], kwargs: Dict[str, Any]
+    ):
         assert callable(fn), "fn must be callable"
         self._fn = fn
         self._args = args or tuple()
@@ -28,8 +30,16 @@ class Promise:
         if self._fn is None:
             raise ValueError("No function bound to promise")
         if not self._executed:
-            self._result = self._fn(*[arg.execute() if isinstance(arg, Promise) else arg for arg in self._args],
-                                    **{k: v.execute() if isinstance(v, Promise) else v for k, v in self._kwargs.items()})
+            self._result = self._fn(
+                *[
+                    arg.execute() if isinstance(arg, Promise) else arg
+                    for arg in self._args
+                ],
+                **{
+                    k: v.execute() if isinstance(v, Promise) else v
+                    for k, v in self._kwargs.items()
+                },
+            )
             self._executed = True
         return self._result
 
@@ -40,10 +50,11 @@ class Promise:
     def __repr__(self):
         if self._fn is None:
             return f"{self.__class__.__name__}()"
-        inner_repr = f"{self._fn.__name__}{signature(self._fn).bind(*self._args, **self._kwargs).args}".split("\n")
+        inner_repr = f"{self._fn.__name__}{signature(self._fn).bind(*self._args, **self._kwargs).args}".split(
+            "\n"
+        )
         inner_repr = "\n\t".join(inner_repr)
         return f"{self.__class__.__name__}(\n\t{inner_repr}\n)"
-
 
 
 class CachePromise(Promise, ABC):
@@ -71,8 +82,16 @@ class CachePromise(Promise, ABC):
             if result is not None:
                 self._set_result(result)
             else:
-                self._result = self._fn(*[arg.execute() if isinstance(arg, Promise) else arg for arg in self._args],
-                                        **{k: v.execute() if isinstance(v, Promise) else v for k, v in self._kwargs.items()})
+                self._result = self._fn(
+                    *[
+                        arg.execute() if isinstance(arg, Promise) else arg
+                        for arg in self._args
+                    ],
+                    **{
+                        k: v.execute() if isinstance(v, Promise) else v
+                        for k, v in self._kwargs.items()
+                    },
+                )
                 self._executed = True
                 self.save(self.cache_dir)
         return self._result
